@@ -1,0 +1,7 @@
+README.md
+setup.py
+pymola/Pymola.egg-info/PKG-INFO
+pymola/Pymola.egg-info/SOURCES.txt
+pymola/Pymola.egg-info/dependency_links.txt
+pymola/Pymola.egg-info/requires.txt
+pymola/Pymola.egg-info/top_level.txt

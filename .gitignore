@@ -1,12 +1,13 @@
 # Dymola / Modelica
 buildlog.txt
-dsfinal.txt
-dsin.txt
-dslog.txt
-dsmodel.c
-dsres.mat
+ds*
 dymosim.exe
+empty.txt
+func*.mat
 modelDescription.xml
+Modelica*.exe
+request
+status
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -16,26 +17,6 @@ __pycache__/
 # C extensions
 *.so
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-#eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-#*.egg
-MANIFEST
-
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
@@ -44,16 +25,8 @@ pip-delete-this-directory.txt
 *.mo
 *.pot
 
-# pyenv
-#   For a library or package, you might want to ignore these files since the code is
-#   intended to run in multiple environments; otherwise, check them in:
-# .python-version
-
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
-__pypackages__/
-
 # Environments
-.env
+#.env
 .venv
 env/
 venv/
@@ -61,11 +34,8 @@ ENV/
 env.bak/
 venv.bak/
 
-# pytype static type analyzer
-.pytype/
-
-# Cython debug symbols
-cython_debug/
+# VSCode
+.vscode/
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
