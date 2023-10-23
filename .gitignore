@@ -8,6 +8,13 @@ modelDescription.xml
 Modelica*.exe
 request
 status
+list.txt
+
+# conda
+.conda/
+
+# FMU
+data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
