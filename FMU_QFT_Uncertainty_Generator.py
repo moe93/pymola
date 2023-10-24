@@ -1,10 +1,11 @@
 '''
-Generate uncertainties in the model for QFT bounds.
+PyFMI based model.
+    Generate uncertainties in the model for QFT bounds.
 
 Author      :   Mohammad Odeh
 E-mail      :   contact@mohammadodeh.com
-Date        :   Oct. 21st, 2023
-Modified    :   Oct. 21st, 2020 too and one
+Date        :   Oct. 24th, 2023
+Modified    :   Oct. 24th, 2020 too and one
 '''
 
 # --- Add the dymola.egg file to path to access the Dymola API
@@ -13,13 +14,14 @@ egg_path = './eggs/dymola.egg'
 sys.path.append(egg_path)
 
 # --- Do the rest of the usual imports here
-from    platform                            import  system
-from    dymola.dymola_interface             import  DymolaInterface
-from    dymola.dymola_exception             import  DymolaException
-from    pathlib                             import  Path
-from    scipy.io                            import  loadmat
-import  numpy                               as      np
-import  pandas                              as      pd
+from    pyfmi                           import  load_fmu
+from    pyfmi                           import  fmi
+
+from    platform                        import  system
+from    pathlib                         import  Path
+from    scipy.io                        import  loadmat
+import  numpy                           as      np
+import  pandas                          as      pd
 
 # --- While Dymola runs on different operating systems, I only need it to run on Windows for personal reasons.
 if( system() != "Windows" ): exit
@@ -34,72 +36,50 @@ if __name__ == '__main__':
 
     # --- Current path where this script is running from
     currentPath = Path(__file__).resolve().parent
-    # --- Not the best way to create a path, but will suffice for now
-    modelPath = Path( "C:\\", "Users", "mo780715", "Desktop", "fowt", "FOWT", "package.mo" )
-    # --- Name of model we are interested in simulating
-    modelName = "FOWT.Tests.Experimental.Linearize.TurbineMIMO_QFT.Regime3.LinearModels.FOCAL_MIMO_Regime3_embedded_GenTrq"
-
-    # Create empty dymola object
-    dymola = None
+    # --- Name of FMU model we are interested in simulating
+    fmuName = "FMU_QFT_MIMO_Regime3.fmu"
+    # --- Full path to FMU
+    fmuPath = Path( currentPath, 'data', fmuName )
+    
     try:
-        # Instantiate Dymola interface and start
-        dymola = DymolaInterface()      
+        # --- Load FMU and get states, inputs, and outputs
+        model       = load_fmu( fmuPath )
+        modelVars   = model.get_model_variables()       # All model outputs
+        modelStates = model.get_states_list()           # Model states
+        modelInputs = model.get_input_list()            # Model inputs
+        modelOutputs= model.get_output_list()           # Model outputs
 
-        # # --- Open model in Dymola and check its return value
-        # print( "[INFO] Opening model." )
-
-        openModel = dymola.openModel( modelPath.__str__()   ,   # Path to model
-                                      mustRead = False      ,   # Don't re-read
-                                      changeDirectory = False ) # Keep directory
-
-        # If we failed to open the file, throw error and exit.
-        if( not openModel ):
-            print( "Could not open file. Below is the error log." )
-            print( dymola.getLastErrorLog() )
-            exit(1)
-        else:
-            print( "[INFO] Model found and opened.")
+        # --- Extract names of states, inputs, and outputs
+        xNames = [None] * len( modelStates )            # Init list of size
+        uNames = [None] * len( modelInputs )            # ...
+        yNames = [None] * len( modelOutputs )           # ...
         
-        # --- Linearize model
-        print( "[INFO] Linearizing model." )
+        for ndx, name in enumerate( modelStates ):      # Loop over list
+            xNames[ ndx ] = name                        #   Populate
+        for ndx, name in enumerate( modelInputs ):      # ...
+            uNames[ ndx ] = name                        #   ...
+        for ndx, name in enumerate( modelOutputs ):     # ...
+            yNames[ ndx ] = name                        #   ...
 
-        linearModel = dymola.linearizeModel( modelName,
-                                             startTime  = 0.0,
-                                             stopTime   = 0.1 )
-        if( not linearModel ):
-            print( "[INFO] Could not linearize. Below is the error log." )
-            print( dymola.getLastErrorLog() )
-            exit(1)
-        else:
-            print( "[INFO] Linearization successful." )
+        del modelStates                                 # Delete variable
+        del modelInputs                                 # ...
+        del modelOutputs                                # ...
 
-        # --- Explore generated .mat file
-        linearMat   = loadmat( "dslin.mat" )
-        nStates     = (linearMat["nx"])[0][0]           # Total states (as int)
-        ABCD        = linearMat["ABCD"]                 # Extract ABCD matrix
-        A           = ABCD[0:nStates , 0:nStates ]      # [A] matrix
-        B           = ABCD[0:nStates , nStates:  ]      # [B] matrix
-        C           = ABCD[nStates:  , 0:nStates ]      # [C] matrix
-        D           = ABCD[nStates:  , nStates:  ]      # [D] matrix
+        # Initialize model
+        model.initialize()
 
-        # Get states, inputs, and outputs names'
-        xuyNames    = linearMat["xuyName"]
-        xStart      = 0         ;   xStop = nStates
-        uStart      = xStop     ;   uStop = uStart+B.shape[1]
-        yStart      = uStop
-        xNames      = xuyNames[xStart:xStop].tolist()   # States  (x) names
-        uNames      = xuyNames[uStart:uStop].tolist()   # Inputs  (u) names
-        yNames      = xuyNames[yStart:     ].tolist()   # Outputs (y) names
+        # Get references of variables of interest that we want to manipulate
+        phi_ref     = modelVars['fMU_linHub.hub_revolute.phi'].value_reference
+        omega_ref   = modelVars['fMU_linHub.hub_revolute.w'  ].value_reference
 
-        # Clean up names (remove whitespace then remove \x00 encoding)
-        for index, name in enumerate( xNames ):
-            xNames[ index ] = name.strip().rstrip( '\x00' )
-        
-        for index, name in enumerate( uNames ):
-            uNames[ index ] = name.strip().rstrip( '\x00' )
+        # Get values from references
+        phi         = model.get_real( phi_ref   )
+        omega       = model.get_real( omega_ref )
 
-        for index, name in enumerate( yNames ):
-            yNames[ index ] = name.strip().rstrip( '\x00' )
+        # --- Get S.S. representation and extract A, B, C, D matrices
+        stateSpace  = model.get_state_space_representation()
+        A = stateSpace[0].A;    B = stateSpace[1].A
+        C = stateSpace[2].A;    D = stateSpace[3].A
 
         # Convert to pd dataframes
         A_df     = pd.DataFrame( A, index=xNames, columns=xNames )
@@ -107,15 +87,20 @@ if __name__ == '__main__':
         C_df     = pd.DataFrame( C, index=yNames, columns=xNames )
         D_df     = pd.DataFrame( D, index=yNames, columns=uNames )
 
-        # --- Translate model to get updatable params
-        dymola.ExecuteCommand( f'stateSpace=Modelica_LinearSystems2.ModelAnalysis.Linearize({modelName})' )
-        dymola.ExecuteCommand( f'Modelica_LinearSystems2.StateSpace.Analysis.analysis2.printSystem(stateSpace)' )
+
+        # ======================================================================
+        # ---   Change rotor speed and re-linearize
+        # ======================================================================
+        model.set_real( omega_ref, omega*1.075 )
+        omega_updated = model.get_real( omega_ref )
+        # --- Get S.S. representation and extract A, B, C, D matrices
+        stateSpace  = model.get_state_space_representation()
+        A = stateSpace[0].A;    B = stateSpace[1].A
+        C = stateSpace[2].A;    D = stateSpace[3].A
 
 
-    except DymolaException as ex:
-        print(("Error: " + str(ex)))
+    # except DymolaException as ex:
+    #     print(("Error: " + str(ex)))
 
     finally:
-        if dymola is not None:
-            dymola.close()
-            dymola = None
+        pass
