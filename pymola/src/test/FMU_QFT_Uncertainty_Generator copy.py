@@ -8,12 +8,19 @@ Date        :   Oct. 24th, 2023
 Modified    :   Oct. 24th, 2020 too and one
 '''
 
+# --- Add the dymola.egg file to path to access the Dymola API
+import sys
+egg_path = './eggs/dymola.egg'
+sys.path.append(egg_path)
+
 # --- Do the rest of the usual imports here
 from    pyfmi                           import  load_fmu
 from    pyfmi                           import  fmi
 
 from    platform                        import  system
 from    pathlib                         import  Path
+from    scipy.io                        import  loadmat
+import  numpy                           as      np
 import  pandas                          as      pd
 
 # --- While Dymola runs on different operating systems, I only need it to run on Windows for personal reasons.
