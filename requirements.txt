@@ -419,7 +419,7 @@ webencodings==0.5.1
     #   tinycss2
 websocket-client==1.6.4
     # via jupyter-server
-werkzeug==2.2.3
+werkzeug==3.0.1
     # via
     #   dash
     #   flask
