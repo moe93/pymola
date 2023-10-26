@@ -1,7 +1,6 @@
-numpy
-pandas
-scipy
-wxpython
+matplotlib==3.8.0
+pandas==2.1.1
+wxpython==4.2.1
 
 [GUI]
 fmpy==0.3.18

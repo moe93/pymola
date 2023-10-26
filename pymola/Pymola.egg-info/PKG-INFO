@@ -29,10 +29,9 @@ Classifier: Topic :: Scientific/Engineering :: Mathematics
 Classifier: Topic :: Scientific/Engineering :: Physics
 Requires-Python: >=3.8, <4
 Description-Content-Type: text/markdown
-Requires-Dist: numpy
-Requires-Dist: pandas
-Requires-Dist: scipy
-Requires-Dist: wxpython
+Requires-Dist: matplotlib==3.8.0
+Requires-Dist: pandas==2.1.1
+Requires-Dist: wxpython==4.2.1
 Provides-Extra: gui
 Requires-Dist: fmpy==0.3.18; extra == "gui"
 Requires-Dist: opencv-python-headless==4.8.1.78; extra == "gui"

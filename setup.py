@@ -77,11 +77,9 @@ setup(
         include_package_data=True,
         python_requires=">=3.8, <4",
         install_requires=[
-                'matplotlib',
-                'numpy',
-                'pandas',
-                'scipy',
-                'wxpython'
+                'matplotlib==3.8.0',
+                'pandas==2.1.1',
+                'wxpython==4.2.1'
                 ],
         extras_require={
                 "GUI": ['fmpy==0.3.18',
