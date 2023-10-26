@@ -19,14 +19,32 @@ Make sure to add conda to the PATH variable. Open the Anaconda3 command prompt a
 where conda
 ```
 
-Add the directories listed to PATH. The in VSCode, open a terminal prompt and type ```conda init```. Once you create your conda environment, you should now be able to activate it.
+Add the directories listed to PATH. Then in VSCode, open a terminal prompt and type ```conda init```. Once you create your conda environment, you should now be able to activate it.
 
-Using conda allows you to utilize PyFMI. To install
+
+If using macOS, don't bother with any of that. Simply use
+```
+brew install --cask anaconda
+```
+
+If you don't want the bloated Anaconda installation and don't mind being behind the driver seat, you can use miniconda instead
+```
+brew install --cask miniconda
+```
+
+---
+
+Using conda allows you to easily install and use PyFMI from [Modelon](https://github.com/modelon-community/PyFMI). To install
 ```
 conda install -c conda-forge pyfmi
 ```
 
-## FMU Support
+In addition, it makes it easier to install FMPy from [CATIA (© Dassault Systèmes)](https://github.com/CATIA-Systems/FMPy)
+```
+conda install -c conda-forge fmpy
+```
+
+## FMU GUI
 You can start the FMPy GUI with
 ```
 python -m fmpy.gui
