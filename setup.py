@@ -77,13 +77,18 @@ setup(
         include_package_data=True,
         python_requires=">=3.8, <4",
         install_requires=[
-                'matplotlib==3.8.0',
-                'numpy==1.26.1',
-                'pandas==2.1.1',
-                'scipy==1.11.3',
-                'wxpython==4.2.1'
+                'matplotlib',
+                'numpy',
+                'pandas',
+                'scipy',
+                'wxpython'
                 ],
         extras_require={
-                "GUI": ['fmpy[complete]==0.3.18'],
+                "GUI": ['fmpy==0.3.18',
+                        'opencv-python-headless==4.8.1.78',
+                        'PyQt5==5.15.10',
+                        'pyqtgraph==0.13.3',
+                        'PyQtWebEngine==5.15.6'
+                        ],
                 },
         )

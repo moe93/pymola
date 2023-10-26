@@ -29,13 +29,16 @@ Classifier: Topic :: Scientific/Engineering :: Mathematics
 Classifier: Topic :: Scientific/Engineering :: Physics
 Requires-Python: >=3.8, <4
 Description-Content-Type: text/markdown
-Requires-Dist: matplotlib==3.8.0
-Requires-Dist: numpy==1.26.1
-Requires-Dist: pandas==2.1.1
-Requires-Dist: scipy==1.11.3
-Requires-Dist: wxpython==4.2.1
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: scipy
+Requires-Dist: wxpython
 Provides-Extra: gui
-Requires-Dist: fmpy[complete]==0.3.18; extra == "gui"
+Requires-Dist: fmpy==0.3.18; extra == "gui"
+Requires-Dist: opencv-python-headless==4.8.1.78; extra == "gui"
+Requires-Dist: PyQt5==5.15.10; extra == "gui"
+Requires-Dist: pyqtgraph==0.13.3; extra == "gui"
+Requires-Dist: PyQtWebEngine==5.15.6; extra == "gui"
 
 # Pymola
 Python for Dymola
@@ -58,14 +61,32 @@ Make sure to add conda to the PATH variable. Open the Anaconda3 command prompt a
 where conda
 ```
 
-Add the directories listed to PATH. The in VSCode, open a terminal prompt and type ```conda init```. Once you create your conda environment, you should now be able to activate it.
+Add the directories listed to PATH. Then in VSCode, open a terminal prompt and type ```conda init```. Once you create your conda environment, you should now be able to activate it.
 
-Using conda allows you to utilize PyFMI. To install
+
+If using macOS, don't bother with any of that. Simply use
+```
+brew install --cask anaconda
+```
+
+If you don't want the bloated Anaconda installation and don't mind being behind the driver seat, you can use miniconda instead
+```
+brew install --cask miniconda
+```
+
+---
+
+Using conda allows you to easily install and use PyFMI from [Modelon](https://github.com/modelon-community/PyFMI). To install
 ```
 conda install -c conda-forge pyfmi
 ```
 
-## FMU Support
+In addition, it makes it easier to install FMPy from [CATIA (© Dassault Systèmes)](https://github.com/CATIA-Systems/FMPy)
+```
+conda install -c conda-forge fmpy
+```
+
+## FMU GUI
 You can start the FMPy GUI with
 ```
 python -m fmpy.gui

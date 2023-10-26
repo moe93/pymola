@@ -4,38 +4,18 @@
 #
 #    pip-compile
 #
-contourpy==1.1.1
-    # via matplotlib
-cycler==0.12.1
-    # via matplotlib
-fonttools==4.43.1
-    # via matplotlib
-kiwisolver==1.4.5
-    # via matplotlib
-matplotlib==3.8.0
-    # via Pymola (setup.py)
 numpy==1.26.1
     # via
     #   Pymola (setup.py)
-    #   contourpy
-    #   matplotlib
     #   pandas
     #   scipy
     #   wxpython
-packaging==23.2
-    # via matplotlib
 pandas==2.1.1
     # via Pymola (setup.py)
 pillow==10.1.0
-    # via
-    #   matplotlib
-    #   wxpython
-pyparsing==3.1.1
-    # via matplotlib
+    # via wxpython
 python-dateutil==2.8.2
-    # via
-    #   matplotlib
-    #   pandas
+    # via pandas
 pytz==2023.3.post1
     # via pandas
 scipy==1.11.3
