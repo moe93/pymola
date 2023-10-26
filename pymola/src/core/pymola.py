@@ -103,11 +103,36 @@ class Pymola( object ):
         """
     
         # Get references of variables of interest that we want to manipulate
-        var_ref     = self.modelVars[ param_name ].value_reference
+        param_ref   = self.modelVars[ param_name ].value_reference
         # Get values from references
-        var_val     = self.model.get_real( var_ref )
+        param_val   = self.model.get_real( param_ref )
 
-        return var_val
+        return param_val
+
+    def set_param_value( self, param_name: str, new_val: int|float ) -> None:
+        """
+        
+        Set value of a specific model parameter
+
+        Parameters
+        ----------
+        param_name:
+            String containing name of parameter of interest
+        new_val:
+            Integer or float (Modelica Integer or Real) for new parameter value
+        """
+    
+        # Get references of variables of interest that we want to manipulate
+        param_ref   = self.modelVars[ param_name ].value_reference
+
+        # Set new value
+        if isinstance( new_val, int ):
+            self.model.set_integer( param_ref, new_val )
+        elif isinstance( new_val, float ):
+            self.model.set_real( param_ref, new_val )
+        else:
+            Exception( 'Invalid input. Only int and float are permitted' )
+
     
     def linearize( self, as_pdDataFrame: bool = False ) -> tuple[np.ndarray|pd.DataFrame, np.ndarray|pd.DataFrame, np.ndarray|pd.DataFrame, np.ndarray|pd.DataFrame]:
         """
