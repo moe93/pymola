@@ -77,11 +77,13 @@ setup(
         include_package_data=True,
         python_requires=">=3.8, <4",
         install_requires=[
-                'fmpy[complete]==0.3.18',
                 'matplotlib==3.8.0',
                 'numpy==1.26.1',
                 'pandas==2.1.1',
                 'scipy==1.11.3',
                 'wxpython==4.2.1'
                 ],
+        extras_require={
+                "GUI": ['fmpy[complete]==0.3.18'],
+                },
         )

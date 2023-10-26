@@ -1,4 +1,8 @@
-fmpy[complete]==0.3.18
+matplotlib==3.8.0
 numpy==1.26.1
 pandas==2.1.1
 scipy==1.11.3
+wxpython==4.2.1
+
+[GUI]
+fmpy[complete]==0.3.18
