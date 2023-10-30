@@ -33,14 +33,14 @@ A_nom, B_nom, C_nom, D_nom = model.linearize()
 A_df, B_df, C_df, D_df = model.linearize( as_pdDataFrame=True )
 
 # Sweep over azimuth angle
-azimuth = [ i for i in range(0, 360, 30)]
+azimuth = [i for i in range(0, 360, 90)]
 n_depth = len( azimuth )
 
 # Initialize 3D matrices for data storage
-A_3D = np.zeros( (n_depth, A_nom.shape[0], A_nom.shape[1]), dtype=np.float32 )
-B_3D = np.zeros( (n_depth, B_nom.shape[0], B_nom.shape[1]), dtype=np.float32 )
-C_3D = np.zeros( (n_depth, C_nom.shape[0], C_nom.shape[1]), dtype=np.float32 )
-D_3D = np.zeros( (n_depth, D_nom.shape[0], D_nom.shape[1]), dtype=np.float32 )
+A_3D = np.zeros( (n_depth, A_nom.shape[0], A_nom.shape[1]) )
+B_3D = np.zeros( (n_depth, B_nom.shape[0], B_nom.shape[1]) )
+C_3D = np.zeros( (n_depth, C_nom.shape[0], C_nom.shape[1]) )
+D_3D = np.zeros( (n_depth, D_nom.shape[0], D_nom.shape[1]) )
 
 for ndx, angle in enumerate( azimuth ):
     model.set_param_value( paramNames[0], angle )
@@ -79,121 +79,110 @@ def get_change( max_elem, min_elem):
         # return float('inf')
         return 0
     
-delta_A = np.zeros_like( A_nom )
-for ith_Row, ith_Col in np.ndindex(A_nom.shape):
-    print( f'(ith_Row, ith_Col) = ({ith_Row}, {ith_Col})' )
-    max_elem = A_max[ith_Row, ith_Col]
-    min_elem = A_min[ith_Row, ith_Col]
-    delta_A[ith_Row, ith_Col] = get_change(max_elem, min_elem)
+# delta_A = np.zeros_like( A_nom )
+# for ith_Row, ith_Col in np.ndindex(A_nom.shape):
+#     print( f'(ith_Row, ith_Col) = ({ith_Row}, {ith_Col})' )
+#     max_elem = A_max[ith_Row, ith_Col]
+#     min_elem = A_min[ith_Row, ith_Col]
+#     delta_A[ith_Row, ith_Col] = get_change(max_elem, min_elem)
 
-# Normalize values
-A_final = delta_A / np.amax(delta_A)
+# # Normalize values
+# A_final = delta_A / np.amax(delta_A)
 
-fig = plt.figure()
-ax = plt.axes(projection = "3d")
+# fig = plt.figure()
+# ax = plt.axes(projection = "3d")
+
+# data = A_final.T
  
-countries = [" ","Australia", " ","Brazil", " ","Canada", " ","France"]
-
-data = A_final.T
-years = [None, None, 2005, None, 2010, None, 2015]
+# numOfRows = data.shape[0]
+# numOfCols = data.shape[1]
  
-numOfRows = data.shape[0]
-numOfCols = data.shape[1]
+# xpos = np.arange(0, numOfCols, 1)
+# ypos = np.arange(0, numOfRows, 1)
+# xpos, ypos = np.meshgrid(xpos + 0.5, ypos + 0.5)
  
-xpos = np.arange(0, numOfCols, 1)
-ypos = np.arange(0, numOfRows, 1)
-xpos, ypos = np.meshgrid(xpos + 0.5, ypos + 0.5)
+# xpos = xpos.flatten()
+# ypos = ypos.flatten()
+# zpos = np.zeros(numOfCols * numOfRows)
  
-xpos = xpos.flatten()
-ypos = ypos.flatten()
-zpos = np.zeros(numOfCols * numOfRows)
+# dx = np.ones(numOfRows * numOfCols) * 0.5
+# dy = np.ones(numOfCols * numOfRows) * 0.5
+# dz = data.flatten()
+
+# cmap = colormaps['jet'] # Get desired colormap
+# max_height = np.max(dz)   # get range of colorbars
+# min_height = np.min(dz)
+# # scale each z to [0,1], and get their rgb values
+# rgba = [cmap((k-min_height)/max_height) for k in dz]
+# ax.set_xticks( [i+1 for i in range(0, numOfCols)],
+#                [ '$x_1$', '$x_2$', '$x_3$', '$x_4$',
+#                  '$x_5$', '$x_6$', '$x_7$', '$x_8$',
+#                  '$x_9$', '$x_{10}$', '$x_{11}$' ] )
+# ax.set_yticks( [i+1 for i in range(0, numOfRows)],
+#                [ '$x_1$', '$x_2$', '$x_3$', '$x_4$',
+#                  '$x_5$', '$x_6$', '$x_7$', '$x_8$',
+#                  '$x_9$', '$x_{10}$', '$x_{11}$' ] )
+# ax.bar3d(xpos, ypos, zpos, dx, dy, dz, color=rgba, zsort='average')
+
+# ax.set_xlabel( 'Row' )
+# ax.set_ylabel( 'Column' )
+# ax.set_zlabel( r'Normalized % change: $|\delta(min, max) \ / \ min|$' )
+
+# plt.show()
+
+# # ======================================
+# # --- 3D BAR COLORMAP PLOTS (B MATRIX)
+# # ======================================
+
+# delta_B = np.zeros_like( B_nom )
+# for ith_Row, ith_Col in np.ndindex(B_nom.shape):
+#     print( f'(ith_Row, ith_Col) = ({ith_Row}, {ith_Col})' )
+#     max_elem = B_max[ith_Row, ith_Col]
+#     min_elem = B_min[ith_Row, ith_Col]
+#     delta_B[ith_Row, ith_Col] = get_change(max_elem, min_elem)
+
+# # Normalize values
+# B_final = delta_B / np.amax(delta_B)
+
+# fig = plt.figure()
+# ax = plt.axes(projection = "3d")
+
+# data = B_final.T
  
-dx = np.ones(numOfRows * numOfCols) * 0.5
-dy = np.ones(numOfCols * numOfRows) * 0.5
-dz = data.flatten()
-
-# --- Color map stuff
-# cmap = cm.get_cmap('jet') # Get desired colormap
-cmap = colormaps['jet'] # Get desired colormap
-max_height = np.max(dz)   # get range of colorbars
-min_height = np.min(dz)
-# scale each z to [0,1], and get their rgb values
-rgba = [cmap((k-min_height)/max_height) for k in dz]
-ax.set_xticks( [i+1 for i in range(0, numOfCols)],
-               [ '$x_1$', '$x_2$', '$x_3$', '$x_4$',
-                 '$x_5$', '$x_6$', '$x_7$', '$x_8$',
-                 '$x_9$', '$x_{10}$', '$x_{11}$' ] )
-ax.set_yticks( [i+1 for i in range(0, numOfRows)],
-               [ '$x_1$', '$x_2$', '$x_3$', '$x_4$',
-                 '$x_5$', '$x_6$', '$x_7$', '$x_8$',
-                 '$x_9$', '$x_{10}$', '$x_{11}$' ] )
-ax.bar3d(xpos, ypos, zpos, dx, dy, dz, color=rgba, zsort='average')
-# ax.bar3d(xpos, ypos, zpos, dx, dy, dz, color=rgba )
-# --- END
+# numOfRows = data.shape[0]
+# numOfCols = data.shape[1]
  
-# ax.bar3d(xpos, ypos, zpos, dx, dy, dz)
-# ax.set_xticklabels(countries)
-# ax.set_yticklabels(years)
-
-ax.set_xlabel( 'Row' )
-ax.set_ylabel( 'Column' )
-ax.set_zlabel( r'Normalized % change: $|\delta(min, max) \ / \ min|$' )
-
-plt.show()
-
-# ======================================
-# --- 3D BAR COLORMAP PLOTS (B MATRIX)
-# ======================================
-
-delta_B = np.zeros_like( B_nom )
-for ith_Row, ith_Col in np.ndindex(B_nom.shape):
-    print( f'(ith_Row, ith_Col) = ({ith_Row}, {ith_Col})' )
-    max_elem = B_max[ith_Row, ith_Col]
-    min_elem = B_min[ith_Row, ith_Col]
-    delta_B[ith_Row, ith_Col] = get_change(max_elem, min_elem)
-
-# Normalize values
-B_final = delta_B / np.amax(delta_B)
-
-fig = plt.figure()
-ax = plt.axes(projection = "3d")
-
-data = B_final.T
+# xpos = np.arange(0, numOfCols, 1)
+# ypos = np.arange(0, numOfRows, 1)
+# xpos, ypos = np.meshgrid(xpos + 0.5, ypos + 0.5)
  
-numOfRows = data.shape[0]
-numOfCols = data.shape[1]
+# xpos = xpos.flatten()
+# ypos = ypos.flatten()
+# zpos = np.zeros(numOfCols * numOfRows)
  
-xpos = np.arange(0, numOfCols, 1)
-ypos = np.arange(0, numOfRows, 1)
-xpos, ypos = np.meshgrid(xpos + 0.5, ypos + 0.5)
- 
-xpos = xpos.flatten()
-ypos = ypos.flatten()
-zpos = np.zeros(numOfCols * numOfRows)
- 
-dx = np.ones(numOfRows * numOfCols) * 0.5
-dy = np.ones(numOfCols * numOfRows) * 0.5
-dz = data.flatten()
+# dx = np.ones(numOfRows * numOfCols) * 0.5
+# dy = np.ones(numOfCols * numOfRows) * 0.5
+# dz = data.flatten()
 
-cmap = colormaps['jet'] # Get desired colormap
-max_height = np.max(dz)   # get range of colorbars
-min_height = np.min(dz)
+# cmap = colormaps['jet'] # Get desired colormap
+# max_height = np.max(dz)   # get range of colorbars
+# min_height = np.min(dz)
 
-# scale each z to [0,1], and get their rgb values
-rgba = [cmap((k-min_height)/max_height) for k in dz]
-ax.set_xticks( [i+1 for i in range(0, numOfCols)],
-               [ '$x_1$', '$x_2$', '$x_3$', '$x_4$',
-                 '$x_5$', '$x_6$', '$x_7$', '$x_8$',
-                 '$x_9$', '$x_{10}$', '$x_{11}$' ] )
-ax.set_yticks( [i+1 for i in range(0, numOfRows)], 
-               [ '$u_1$', '$u_2$', '$u_3$', '$u_4$' ] )
-ax.bar3d(xpos, ypos, zpos, dx, dy, dz, color=rgba, zsort='average')
+# # scale each z to [0,1], and get their rgb values
+# rgba = [cmap((k-min_height)/max_height) for k in dz]
+# ax.set_xticks( [i+1 for i in range(0, numOfCols)],
+#                [ '$x_1$', '$x_2$', '$x_3$', '$x_4$',
+#                  '$x_5$', '$x_6$', '$x_7$', '$x_8$',
+#                  '$x_9$', '$x_{10}$', '$x_{11}$' ] )
+# ax.set_yticks( [i+1 for i in range(0, numOfRows)], 
+#                [ '$u_1$', '$u_2$', '$u_3$', '$u_4$' ] )
+# ax.bar3d(xpos, ypos, zpos, dx, dy, dz, color=rgba, zsort='average')
 
-ax.set_xlabel( 'Row' )
-ax.set_ylabel( 'Column' )
-ax.set_zlabel( r'Normalized % change: $|\delta(min, max) \ / \ min|$' )
+# ax.set_xlabel( 'Row' )
+# ax.set_ylabel( 'Column' )
+# ax.set_zlabel( r'Normalized % change: $|\delta(min, max) \ / \ min|$' )
 
-plt.show()
+# plt.show()
 
 # ======================================
 # --- 3D BAR COLORMAP PLOTS (A MATRIX) for each azimuth
@@ -201,11 +190,11 @@ plt.show()
 
 for ndx, angle in enumerate( azimuth ):
     # Get A at angle
-    A_angle = B_3D[ ndx ]
+    A_angle = A_3D[ ndx ]
 
     # Get change from average
-    A_temp = np.zeros_like( B_mean )
-    for ith_Row, ith_Col in np.ndindex(B_mean.shape):
+    A_temp = np.zeros_like( A_mean )
+    for ith_Row, ith_Col in np.ndindex(A_mean.shape):
         crnt_elem = A_angle[ith_Row, ith_Col]
         mean_elem = A_mean[ith_Row, ith_Col]
         A_temp[ith_Row, ith_Col] = get_change(crnt_elem, mean_elem)
@@ -243,10 +232,10 @@ for ndx, angle in enumerate( azimuth ):
                 [ '$x_1$', '$x_2$', '$x_3$', '$x_4$',
                     '$x_5$', '$x_6$', '$x_7$', '$x_8$',
                     '$x_9$', '$x_{10}$', '$x_{11}$' ] )
-    # ax.set_yticks( [i+1 for i in range(0, numOfRows)],
-    #            [ '$x_1$', '$x_2$', '$x_3$', '$x_4$',
-    #              '$x_5$', '$x_6$', '$x_7$', '$x_8$',
-    #              '$x_9$', '$x_{10}$', '$x_{11}$' ] )
+    ax.set_yticks( [i+1 for i in range(0, numOfRows)],
+               [ '$x_1$', '$x_2$', '$x_3$', '$x_4$',
+                 '$x_5$', '$x_6$', '$x_7$', '$x_8$',
+                 '$x_9$', '$x_{10}$', '$x_{11}$' ] )
     ax.bar3d(xpos, ypos, zpos, dx, dy, dz, color=rgba, zsort='average')
 
     ax.set_xlabel( 'Row' )
@@ -254,6 +243,10 @@ for ndx, angle in enumerate( azimuth ):
     ax.set_zlabel( r'Normalized % change: $|\delta(min, max) \ / \ min|$' )
 
     plt.show()
+
+aa, bb, cc, dd = model.sweep( dict(zip(paramNames, [azimuth])), TOL=1e-5 )
+
+model.plot_bar3d_A( aa, 'Azizu', azimuth )
 
 pass
 

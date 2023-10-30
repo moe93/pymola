@@ -8,13 +8,14 @@ Modified    :   Oct. 25th, 2020 too and one
 '''
 
 # --- Do the rest of the usual imports here
-from    pyfmi                           import  load_fmu
+from    .base                           import  PymolaObject
+from    ..util.Plotter                  import  Plotter
 
 import  numpy                           as      np
 import  pandas                          as      pd
 
 
-class Pymola( object ):
+class Pymola( PymolaObject, Plotter ):
 
     def __init__( self, fmu ) -> None:
         """
@@ -24,10 +25,10 @@ class Pymola( object ):
         fmu:
             Path to Functional Mockup Unit (FMU) 
         """
-
-        self.model = load_fmu( fmu )                    # Load FMU
-        self.model.initialize()                         # Initialize model
-
+        
+        # Initialize inherited class
+        PymolaObject.__init__( self, fmu )
+        Plotter.__init__( self )
 
     def get_variables( self ) -> list:
         """
@@ -159,3 +160,55 @@ class Pymola( object ):
             D   = pd.DataFrame( D, index=self.yNames, columns=self.uNames )
         
         return A, B, C, D
+    
+    def sweep( self, param_names_vals: dict, TOL: float = 1e-6 ):
+        """
+        
+        Sweep over a list of parameters
+
+        Parameters
+        ----------
+        param_names_vals:
+            Dictionary containing parameter name as dict key and desired values as the dict value.
+        TOL:
+            If below TOL, set element to zero.
+
+        """
+        # # Get parameters and their values
+        # param, val = self._extract_dict( param_names_vals )
+
+        # Loop over parameters and their values
+        for param_name, param_val in param_names_vals.items():
+            
+            # Get number of variations
+            n_depth = len( param_val )
+            # This is the first run for this (key, val) pair
+            init_run = True
+
+            # Fix one parameter and loop over it's variations
+            for ndx, value in enumerate(param_val):
+                self.set_param_value( param_name, value )
+                A, B, C, D  = self.linearize()
+                # Add depth to matrices (3rd dim)
+                A = np.expand_dims(A, axis=0);  B = np.expand_dims(B, axis=0)
+                C = np.expand_dims(C, axis=0);  D = np.expand_dims(D, axis=0)
+                # Remove numbers below threshold (due to numerical limitations)
+                A[np.abs(A) < TOL] = 0;     B[np.abs(B) < TOL] = 0
+                C[np.abs(C) < TOL] = 0;     D[np.abs(D) < TOL] = 0
+
+                if( init_run ):
+                    # Initialize 3D matrices for data storage
+                    A_3D = np.zeros_like( A );  B_3D = np.zeros_like( B )
+                    C_3D = np.zeros_like( C );  D_3D = np.zeros_like( D )
+
+                    # Disable init_run
+                    init_run = False
+                    
+                # Store A, B, C, D in the ndx-th depth of the *_3D matrix
+                A_3D = np.concatenate((A, A_3D), axis=0)
+                B_3D = np.concatenate((B, B_3D), axis=0)
+                C_3D = np.concatenate((C, C_3D), axis=0)
+                D_3D = np.concatenate((D, D_3D), axis=0)
+
+        return A_3D[:-1], B_3D[:-1], C_3D[:-1], D_3D[:-1]
+    

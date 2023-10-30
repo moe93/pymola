@@ -1,3 +1,6 @@
+# macOS
+.DS_Store
+
 # Dymola / Modelica
 buildlog.txt
 ds*
