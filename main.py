@@ -4,6 +4,7 @@ import  numpy                           as      np
 
 # QFT stuff here
 from    scipy                           import  signal
+from    scipy                           import  io
 
 # Custom classes here
 import  pymola
@@ -151,12 +152,22 @@ aa, bb, cc, dd = model.sweep( dict(zip(paramNames, [azimuth])), TOL=1e-5 )
 # --- QFT STUFF HERE
 # ==============================================================================
 
-a = [[-2, -1], [1, 0]]
-b = [[1], [0]]
-c = [[1, 2]] 
-d = 1
-TF = signal.ss2tf( a, b, c, d )
-w, mag, phase = signal.bode( TF )
+# Store into MATLAB style indexing matrix
+aaa = np.swapaxes(aa, 1, 0); aaa = np.swapaxes(aaa, 2, 1)
+bbb = np.swapaxes(bb, 1, 0); aaa = np.swapaxes(bbb, 2, 1)
+ccc = np.swapaxes(cc, 1, 0); aaa = np.swapaxes(ccc, 2, 1)
+ddd = np.swapaxes(dd, 1, 0); aaa = np.swapaxes(ddd, 2, 1)
+
+mat_name = 'azimuth_variation_R3.mat'
+mat_path = Path( currentPath, 'data', mat_name )
+mat_dict = { 'a': aaa, 'b': bbb, 'c': ccc, 'd': ddd }
+io.savemat( mat_path, mat_dict )
+# a = [[-2, -1], [1, 0]]
+# b = [[1], [0]]
+# c = [[1, 2]] 
+# d = 1
+# TF = signal.ss2tf( a, b, c, d )
+# w, mag, phase = signal.bode( TF )
 
 pass
 

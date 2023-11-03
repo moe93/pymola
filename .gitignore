@@ -13,6 +13,9 @@ request
 status
 list.txt
 
+# Generated .mat files
+*.mat
+
 # PyFMI
 *_log.txt
 
