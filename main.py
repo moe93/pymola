@@ -154,9 +154,9 @@ aa, bb, cc, dd = model.sweep( dict(zip(paramNames, [azimuth])), TOL=1e-5 )
 
 # Store into MATLAB style indexing matrix
 aaa = np.swapaxes(aa, 1, 0); aaa = np.swapaxes(aaa, 2, 1)
-bbb = np.swapaxes(bb, 1, 0); aaa = np.swapaxes(bbb, 2, 1)
-ccc = np.swapaxes(cc, 1, 0); aaa = np.swapaxes(ccc, 2, 1)
-ddd = np.swapaxes(dd, 1, 0); aaa = np.swapaxes(ddd, 2, 1)
+bbb = np.swapaxes(bb, 1, 0); bbb = np.swapaxes(bbb, 2, 1)
+ccc = np.swapaxes(cc, 1, 0); ccc = np.swapaxes(ccc, 2, 1)
+ddd = np.swapaxes(dd, 1, 0); ddd = np.swapaxes(ddd, 2, 1)
 
 mat_name = 'azimuth_variation_R3.mat'
 mat_path = Path( currentPath, 'data', mat_name )
