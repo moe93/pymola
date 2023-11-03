@@ -84,25 +84,14 @@ class Plotter( object ):
         """
         self._check_matrix( A )
 
-        A_mean = A.mean(axis=0)
         for ndx, angle in enumerate( A ):
             # Get A at angle
             A_angle = A[ ndx ]
 
-            # Get change from average
-            A_temp = np.zeros_like( A_mean )
-            for ith_Row, ith_Col in np.ndindex(A_mean.shape):
-                crnt_elem = A_angle[ith_Row, ith_Col]
-                mean_elem = A_mean[ith_Row, ith_Col]
-                A_temp[ith_Row, ith_Col] = self.get_change(crnt_elem, mean_elem)
-
-            # Normalize values
-            AA = A_temp / np.amax(A_temp)
-
             fig = plt.figure( num=f'{title} = {variation[ndx]}' )
             ax = plt.axes(projection = "3d")
 
-            data = AA.T
+            data = A_angle.T
             
             numOfRows = data.shape[0]
             numOfCols = data.shape[1]

@@ -1,8 +1,11 @@
 from    platform                        import  system
 from    pathlib                         import  Path
-import  pandas                          as      pd
 import  numpy                           as      np
 
+# QFT stuff here
+from    scipy                           import  signal
+
+# Custom classes here
 import  pymola
 
 # --- While Dymola runs on different operating systems, I only need it to run on Windows for personal reasons.
@@ -78,175 +81,82 @@ def get_change( max_elem, min_elem):
     except ZeroDivisionError:
         # return float('inf')
         return 0
-    
-# delta_A = np.zeros_like( A_nom )
-# for ith_Row, ith_Col in np.ndindex(A_nom.shape):
-#     print( f'(ith_Row, ith_Col) = ({ith_Row}, {ith_Col})' )
-#     max_elem = A_max[ith_Row, ith_Col]
-#     min_elem = A_min[ith_Row, ith_Col]
-#     delta_A[ith_Row, ith_Col] = get_change(max_elem, min_elem)
-
-# # Normalize values
-# A_final = delta_A / np.amax(delta_A)
-
-# fig = plt.figure()
-# ax = plt.axes(projection = "3d")
-
-# data = A_final.T
- 
-# numOfRows = data.shape[0]
-# numOfCols = data.shape[1]
- 
-# xpos = np.arange(0, numOfCols, 1)
-# ypos = np.arange(0, numOfRows, 1)
-# xpos, ypos = np.meshgrid(xpos + 0.5, ypos + 0.5)
- 
-# xpos = xpos.flatten()
-# ypos = ypos.flatten()
-# zpos = np.zeros(numOfCols * numOfRows)
- 
-# dx = np.ones(numOfRows * numOfCols) * 0.5
-# dy = np.ones(numOfCols * numOfRows) * 0.5
-# dz = data.flatten()
-
-# cmap = colormaps['jet'] # Get desired colormap
-# max_height = np.max(dz)   # get range of colorbars
-# min_height = np.min(dz)
-# # scale each z to [0,1], and get their rgb values
-# rgba = [cmap((k-min_height)/max_height) for k in dz]
-# ax.set_xticks( [i+1 for i in range(0, numOfCols)],
-#                [ '$x_1$', '$x_2$', '$x_3$', '$x_4$',
-#                  '$x_5$', '$x_6$', '$x_7$', '$x_8$',
-#                  '$x_9$', '$x_{10}$', '$x_{11}$' ] )
-# ax.set_yticks( [i+1 for i in range(0, numOfRows)],
-#                [ '$x_1$', '$x_2$', '$x_3$', '$x_4$',
-#                  '$x_5$', '$x_6$', '$x_7$', '$x_8$',
-#                  '$x_9$', '$x_{10}$', '$x_{11}$' ] )
-# ax.bar3d(xpos, ypos, zpos, dx, dy, dz, color=rgba, zsort='average')
-
-# ax.set_xlabel( 'Row' )
-# ax.set_ylabel( 'Column' )
-# ax.set_zlabel( r'Normalized % change: $|\delta(min, max) \ / \ min|$' )
-
-# plt.show()
-
-# # ======================================
-# # --- 3D BAR COLORMAP PLOTS (B MATRIX)
-# # ======================================
-
-# delta_B = np.zeros_like( B_nom )
-# for ith_Row, ith_Col in np.ndindex(B_nom.shape):
-#     print( f'(ith_Row, ith_Col) = ({ith_Row}, {ith_Col})' )
-#     max_elem = B_max[ith_Row, ith_Col]
-#     min_elem = B_min[ith_Row, ith_Col]
-#     delta_B[ith_Row, ith_Col] = get_change(max_elem, min_elem)
-
-# # Normalize values
-# B_final = delta_B / np.amax(delta_B)
-
-# fig = plt.figure()
-# ax = plt.axes(projection = "3d")
-
-# data = B_final.T
- 
-# numOfRows = data.shape[0]
-# numOfCols = data.shape[1]
- 
-# xpos = np.arange(0, numOfCols, 1)
-# ypos = np.arange(0, numOfRows, 1)
-# xpos, ypos = np.meshgrid(xpos + 0.5, ypos + 0.5)
- 
-# xpos = xpos.flatten()
-# ypos = ypos.flatten()
-# zpos = np.zeros(numOfCols * numOfRows)
- 
-# dx = np.ones(numOfRows * numOfCols) * 0.5
-# dy = np.ones(numOfCols * numOfRows) * 0.5
-# dz = data.flatten()
-
-# cmap = colormaps['jet'] # Get desired colormap
-# max_height = np.max(dz)   # get range of colorbars
-# min_height = np.min(dz)
-
-# # scale each z to [0,1], and get their rgb values
-# rgba = [cmap((k-min_height)/max_height) for k in dz]
-# ax.set_xticks( [i+1 for i in range(0, numOfCols)],
-#                [ '$x_1$', '$x_2$', '$x_3$', '$x_4$',
-#                  '$x_5$', '$x_6$', '$x_7$', '$x_8$',
-#                  '$x_9$', '$x_{10}$', '$x_{11}$' ] )
-# ax.set_yticks( [i+1 for i in range(0, numOfRows)], 
-#                [ '$u_1$', '$u_2$', '$u_3$', '$u_4$' ] )
-# ax.bar3d(xpos, ypos, zpos, dx, dy, dz, color=rgba, zsort='average')
-
-# ax.set_xlabel( 'Row' )
-# ax.set_ylabel( 'Column' )
-# ax.set_zlabel( r'Normalized % change: $|\delta(min, max) \ / \ min|$' )
-
-# plt.show()
 
 # ======================================
 # --- 3D BAR COLORMAP PLOTS (A MATRIX) for each azimuth
 # ======================================
 
-for ndx, angle in enumerate( azimuth ):
-    # Get A at angle
-    A_angle = A_3D[ ndx ]
+# for ndx, angle in enumerate( azimuth ):
+#     # Get A at angle
+#     A_angle = A_3D[ ndx ]
 
-    # Get change from average
-    A_temp = np.zeros_like( A_mean )
-    for ith_Row, ith_Col in np.ndindex(A_mean.shape):
-        crnt_elem = A_angle[ith_Row, ith_Col]
-        mean_elem = A_mean[ith_Row, ith_Col]
-        A_temp[ith_Row, ith_Col] = get_change(crnt_elem, mean_elem)
+#     # Get change from average
+#     A_temp = np.zeros_like( A_mean )
+#     for ith_Row, ith_Col in np.ndindex(A_mean.shape):
+#         crnt_elem = A_angle[ith_Row, ith_Col]
+#         mean_elem = A_mean[ith_Row, ith_Col]
+#         A_temp[ith_Row, ith_Col] = get_change(crnt_elem, mean_elem)
 
-    # Normalize values
-    AA = A_temp / np.amax(A_temp)
+#     # Normalize values
+#     AA = A_temp / np.amax(A_temp)
 
-    fig = plt.figure(num=f'Azimuth = {angle}')
-    ax = plt.axes(projection = "3d")
+#     fig = plt.figure(num=f'Azimuth = {angle}')
+#     ax = plt.axes(projection = "3d")
 
-    data = AA.T
+#     data = AA.T
     
-    numOfRows = data.shape[0]
-    numOfCols = data.shape[1]
+#     numOfRows = data.shape[0]
+#     numOfCols = data.shape[1]
     
-    xpos = np.arange(0, numOfCols, 1)
-    ypos = np.arange(0, numOfRows, 1)
-    xpos, ypos = np.meshgrid(xpos + 0.5, ypos + 0.5)
+#     xpos = np.arange(0, numOfCols, 1)
+#     ypos = np.arange(0, numOfRows, 1)
+#     xpos, ypos = np.meshgrid(xpos + 0.5, ypos + 0.5)
     
-    xpos = xpos.flatten()
-    ypos = ypos.flatten()
-    zpos = np.zeros(numOfCols * numOfRows)
+#     xpos = xpos.flatten()
+#     ypos = ypos.flatten()
+#     zpos = np.zeros(numOfCols * numOfRows)
     
-    dx = np.ones(numOfRows * numOfCols) * 0.5
-    dy = np.ones(numOfCols * numOfRows) * 0.5
-    dz = data.flatten()
+#     dx = np.ones(numOfRows * numOfCols) * 0.5
+#     dy = np.ones(numOfCols * numOfRows) * 0.5
+#     dz = data.flatten()
 
-    cmap = colormaps['jet'] # Get desired colormap
-    max_height = np.max(dz)   # get range of colorbars
-    min_height = np.min(dz)
+#     cmap = colormaps['jet'] # Get desired colormap
+#     max_height = np.max(dz)   # get range of colorbars
+#     min_height = np.min(dz)
 
-    # scale each z to [0,1], and get their rgb values
-    rgba = [cmap((k-min_height)/max_height) for k in dz]
-    ax.set_xticks( [i+1 for i in range(0, numOfCols)],
-                [ '$x_1$', '$x_2$', '$x_3$', '$x_4$',
-                    '$x_5$', '$x_6$', '$x_7$', '$x_8$',
-                    '$x_9$', '$x_{10}$', '$x_{11}$' ] )
-    ax.set_yticks( [i+1 for i in range(0, numOfRows)],
-               [ '$x_1$', '$x_2$', '$x_3$', '$x_4$',
-                 '$x_5$', '$x_6$', '$x_7$', '$x_8$',
-                 '$x_9$', '$x_{10}$', '$x_{11}$' ] )
-    ax.bar3d(xpos, ypos, zpos, dx, dy, dz, color=rgba, zsort='average')
+#     # scale each z to [0,1], and get their rgb values
+#     rgba = [cmap((k-min_height)/max_height) for k in dz]
+#     ax.set_xticks( [i+1 for i in range(0, numOfCols)],
+#                 [ '$x_1$', '$x_2$', '$x_3$', '$x_4$',
+#                     '$x_5$', '$x_6$', '$x_7$', '$x_8$',
+#                     '$x_9$', '$x_{10}$', '$x_{11}$' ] )
+#     ax.set_yticks( [i+1 for i in range(0, numOfRows)],
+#                [ '$x_1$', '$x_2$', '$x_3$', '$x_4$',
+#                  '$x_5$', '$x_6$', '$x_7$', '$x_8$',
+#                  '$x_9$', '$x_{10}$', '$x_{11}$' ] )
+#     ax.bar3d(xpos, ypos, zpos, dx, dy, dz, color=rgba, zsort='average')
 
-    ax.set_xlabel( 'Row' )
-    ax.set_ylabel( 'Column' )
-    ax.set_zlabel( r'Normalized % change: $|\delta(min, max) \ / \ min|$' )
+#     ax.set_xlabel( 'Row' )
+#     ax.set_ylabel( 'Column' )
+#     ax.set_zlabel( r'Normalized % change: $|\delta(min, max) \ / \ min|$' )
 
-    plt.show()
+#     plt.show()
 
 aa, bb, cc, dd = model.sweep( dict(zip(paramNames, [azimuth])), TOL=1e-5 )
 
-model.plot_bar3d_A( aa, 'Azizu', azimuth )
+# model.plot_bar3d_A( aa, 'Azizu', azimuth )
+
+
+# ==============================================================================
+# --- QFT STUFF HERE
+# ==============================================================================
+
+a = [[-2, -1], [1, 0]]
+b = [[1], [0]]
+c = [[1, 2]] 
+d = 1
+TF = signal.ss2tf( a, b, c, d )
+w, mag, phase = signal.bode( TF )
 
 pass
 
