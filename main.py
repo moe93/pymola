@@ -1,16 +1,13 @@
-from    platform                        import  system
+
 from    pathlib                         import  Path
 import  numpy                           as      np
 
 # QFT stuff here
 from    scipy                           import  signal
-from    scipy                           import  io
 
 # Custom classes here
 import  pymola
 
-# --- While Dymola runs on different operating systems, I only need it to run on Windows for personal reasons.
-if( system() != "Windows" ): exit
 
 # --- Current path where this script is running from
 currentPath = Path(__file__).resolve().parent
@@ -153,15 +150,11 @@ aa, bb, cc, dd = model.sweep( dict(zip(paramNames, [azimuth])), TOL=1e-5 )
 # ==============================================================================
 
 # Store into MATLAB style indexing matrix
-aaa = np.swapaxes(aa, 1, 0); aaa = np.swapaxes(aaa, 2, 1)
-bbb = np.swapaxes(bb, 1, 0); bbb = np.swapaxes(bbb, 2, 1)
-ccc = np.swapaxes(cc, 1, 0); ccc = np.swapaxes(ccc, 2, 1)
-ddd = np.swapaxes(dd, 1, 0); ddd = np.swapaxes(ddd, 2, 1)
-
 mat_name = 'azimuth_variation_R3.mat'
 mat_path = Path( currentPath, 'data', mat_name )
-mat_dict = { 'a': aaa, 'b': bbb, 'c': ccc, 'd': ddd }
-io.savemat( mat_path, mat_dict )
+mat_dict = { 'A': aa, 'B': bb, 'C': cc, 'D': dd }
+pymola.matlab_matrix( mat_path, mat_dict )
+
 # a = [[-2, -1], [1, 0]]
 # b = [[1], [0]]
 # c = [[1, 2]] 
