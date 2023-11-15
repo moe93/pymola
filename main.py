@@ -34,7 +34,7 @@ A_nom, B_nom, C_nom, D_nom = model.linearize()
 A_df, B_df, C_df, D_df = model.linearize( as_pdDataFrame=True )
 
 # Sweep over azimuth angle
-azimuth = [i for i in range(0, 360, 90)]
+azimuth = [i for i in range(0, 360, 30)]
 n_depth = len( azimuth )
 
 # Initialize 3D matrices for data storage
@@ -140,7 +140,7 @@ def get_change( max_elem, min_elem):
 
 #     plt.show()
 
-aa, bb, cc, dd = model.sweep( dict(zip(paramNames, [azimuth])), TOL=1e-5 )
+aa, bb, cc, dd = model.sweep( dict(zip(paramNames, [azimuth])), TOL=1e-8 )
 
 # model.plot_bar3d_A( aa, 'Azizu', azimuth )
 
@@ -150,7 +150,7 @@ aa, bb, cc, dd = model.sweep( dict(zip(paramNames, [azimuth])), TOL=1e-5 )
 # ==============================================================================
 
 # Store into MATLAB style indexing matrix
-mat_name = 'azimuth_variation_R3.mat'
+mat_name = f'azimuth_variation_R3_{len(azimuth)}plants.mat'
 mat_path = Path( currentPath, 'data', mat_name )
 mat_dict = { 'A': aa, 'B': bb, 'C': cc, 'D': dd }
 pymola.matlab_matrix( mat_path, mat_dict )
