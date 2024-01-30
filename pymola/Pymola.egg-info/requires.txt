@@ -1,0 +1,10 @@
+matplotlib==3.8.0
+pandas==2.1.1
+wxpython==4.2.1
+
+[GUI]
+fmpy==0.3.18
+opencv-python-headless==4.8.1.78
+PyQt5==5.15.10
+pyqtgraph==0.13.3
+PyQtWebEngine==5.15.6
