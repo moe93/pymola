@@ -24,7 +24,7 @@ packaging==23.2
     # via matplotlib
 pandas==2.1.1
     # via Pymola (setup.py)
-pillow==10.2.0
+pillow==10.3.0
     # via
     #   matplotlib
     #   wxpython
